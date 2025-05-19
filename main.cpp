@@ -1,7 +1,7 @@
-#include <pnl_calculator.h>
+#include <pnl_calc.h>
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    cout << "Hello world";
+    std::cout << "Hello world";
     return 0;
 }
