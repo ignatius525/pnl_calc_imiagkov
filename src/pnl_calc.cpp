@@ -15,7 +15,29 @@ double calculate_pnl_for_trade(const std::string& method,
                                std::deque<std::pair<int, double>>& fifo_storage,
                                std::stack<std::pair<int, double>>& lifo_storage)
 {
+    int remaining = quantity;
     double pnl = 0.0;
+
+    if (method == "fifo") {
+        while (remaining > 0 && !fifo_storage.empty()) {
+            auto& [q, p] = fifo_storage.front();
+            int matched = std::min(remaining, q);
+            pnl += matched * (price - p);
+            q -= matched;
+            remaining -= matched;
+            if (q == 0) fifo_storage.pop_front();
+        }
+    } else {
+        while (remaining > 0 && !lifo_storage.empty()) {
+            auto& [q, p] = lifo_storage.top();
+            int matched = std::min(remaining, q);
+            pnl += matched * (price - p);
+            q -= matched;
+            remaining -= matched;
+            if (q == 0) lifo_storage.pop();
+        }
+    }
+
     return pnl;
 }
 
@@ -71,10 +93,14 @@ void process_trades(const std::string& filename, const std::string& method) {
 
         char action = act_str[0];
         if (action == 'B') {
-            if (method == "fifo") fifo_map[symbol].emplace_back(qty, price);
-            else lifo_map[symbol].push({qty, price});
+            if (method == "fifo") {
+                fifo_map[symbol].emplace_back(qty, price);
+            } else {
+                lifo_map[symbol].push({qty, price});
+            }
         } else if (action == 'S') {
-            // calc pnl
+            double pnl = calculate_pnl_for_trade(method, action, price, qty, fifo_map[symbol], lifo_map[symbol]);
+            std::cout << timestamp << "," << symbol << "," << std::fixed << std::setprecision(2) << pnl << "\n";
         }
     }
 }
