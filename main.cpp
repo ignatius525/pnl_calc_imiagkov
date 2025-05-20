@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
         cerr << "Use 'fifo' or 'lifo'.\n";
         return 1;
     }
+    // this weird interface class handler is for easy mocking in unit tests and comparing print statements
     StdOutHandler handler;
 
     try {

@@ -19,6 +19,7 @@ double calculate_pnl_for_trade(const std::string& method,
     double pnl = 0.0;
 
     if (method == "fifo") {
+        // we pull what came in first to calc
         while (remaining > 0 && !fifo_storage.empty()) {
             auto& [q, p] = fifo_storage.front();
             int matched = std::min(remaining, q);
@@ -28,6 +29,7 @@ double calculate_pnl_for_trade(const std::string& method,
             if (q == 0) fifo_storage.pop_front();
         }
     } else {
+        // we pull what came in latest (last) to calc
         while (remaining > 0 && !lifo_storage.empty()) {
             auto& [q, p] = lifo_storage.top();
             int matched = std::min(remaining, q);
@@ -46,9 +48,12 @@ void process_trades(const std::string& filename, const std::string& method, OutH
     std::string line;
     getline(file, line);
 
+    // i know this is not optimal, if production case i would create wrapper class that points
+    // to correct struct based on method provided
     std::map<std::string, std::deque<std::pair<int, double>>> fifo_map;
     std::map<std::string, std::stack<std::pair<int, double>>> lifo_map;
 
+    // get all info needed, make sure safely parsed and append to appropriate struct
     while (getline(file, line)) {
         std::istringstream iss(line);
         std::string ts_str, symbol, act_str, price_str, qty_str;
@@ -100,6 +105,7 @@ void process_trades(const std::string& filename, const std::string& method, OutH
             }
         } else if (action == 'S') {
             double pnl = calculate_pnl_for_trade(method, action, price, qty, fifo_map[symbol], lifo_map[symbol]);
+            // handler is nice for mock test cases :)
             handler.printPnL(timestamp, symbol, pnl);
         }
     }
