@@ -3,8 +3,10 @@
 #include <string>
 #include <deque>
 #include <stack>
+#include <iouthandler.h>
 
-void process_trades(const std::string& filename, const std::string& method);
+void process_trades(const std::string& filename, const std::string& method, OutHandler& handler);
+
 double calculate_pnl_for_trade(const std::string& method,
                                char action,
                                double price,

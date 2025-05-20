@@ -41,7 +41,7 @@ double calculate_pnl_for_trade(const std::string& method,
     return pnl;
 }
 
-void process_trades(const std::string& filename, const std::string& method) {
+void process_trades(const std::string& filename, const std::string& method, OutHandler& handler) {
     std::ifstream file(filename);
     std::string line;
     getline(file, line);
@@ -100,7 +100,7 @@ void process_trades(const std::string& filename, const std::string& method) {
             }
         } else if (action == 'S') {
             double pnl = calculate_pnl_for_trade(method, action, price, qty, fifo_map[symbol], lifo_map[symbol]);
-            std::cout << timestamp << "," << symbol << "," << std::fixed << std::setprecision(2) << pnl << "\n";
+            handler.printPnL(timestamp, symbol, pnl);
         }
     }
 }

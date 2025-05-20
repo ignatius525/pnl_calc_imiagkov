@@ -10,3 +10,6 @@ target_link_libraries(pnl_calc PRIVATE pnl_calc_src)
 
 enable_testing()
 add_subdirectory(test)
+
+configure_file(${CMAKE_SOURCE_DIR}/data/moretickers.csv
+               ${CMAKE_BINARY_DIR}/data/moretickers.csv COPYONLY)
